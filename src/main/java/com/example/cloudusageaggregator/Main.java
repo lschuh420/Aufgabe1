@@ -1,5 +1,6 @@
 package com.example.cloudusageaggregator;
 
+import com.example.cloudusageaggregator.ResultPayload.ResultPayload;
 import com.example.cloudusageaggregator.model.DataSetResponse;
 import com.example.cloudusageaggregator.model.UsageResult;
 import com.example.cloudusageaggregator.service.HttpConnector;
@@ -14,25 +15,28 @@ public class Main {
         UsageAggregationService usageAggregationService = new UsageAggregationService();
 
         try {
-            // Fetch dataset from the remote service
+            // Datensatz abrufen
             String jsonDataset = httpConnector.fetchDatasetAsJson();
-            System.out.println("Dataset JSON: " + jsonDataset);
+            System.out.println("Dataset JSON fetched successfully.");
 
-            // Convert JSON to Dataset object
+            // JSON zu Dataset-Objekt konvertieren
             DataSetResponse dataset = usageAggregationService.convertJsonToDataset(jsonDataset);
 
             if (dataset != null && dataset.getEvents() != null) {
                 System.out.println("Number of events fetched: " + dataset.getEvents().size());
 
-                // Process dataset into usage results
-                List<UsageResult> results = usageAggregationService.processDatasetToResult(dataset.getEvents());
-                System.out.println("Number of usage results: " + results.size());
+                // Verarbeitung zu UsageResult-Liste
+                List<UsageResult> usageResults = usageAggregationService.processDatasetToResult(dataset.getEvents());
+                System.out.println("Number of usage results: " + usageResults.size());
 
-                // Convert the result list into JSON format
-                String resultJson = usageAggregationService.convertResultToJson(results);
+                // Ergebnisse in ResultPayload einbetten
+                ResultPayload resultPayload = new ResultPayload(usageResults);
+
+                // JSON aus ResultPayload generieren
+                String resultJson = usageAggregationService.convertResultToJson(resultPayload);
                 System.out.println("Result JSON: " + resultJson);
 
-                // Send the results as JSON back to the server
+                // Ergebnisse an den Server senden
                 httpConnector.sendResult(resultJson);
 
                 System.out.println("Results processed and sent successfully.");
