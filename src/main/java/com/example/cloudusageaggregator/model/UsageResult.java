@@ -1,6 +1,10 @@
 package com.example.cloudusageaggregator.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class UsageResult {
+    @SerializedName("customer_id")
+
     private String customerId;
     private long consumption;
 
