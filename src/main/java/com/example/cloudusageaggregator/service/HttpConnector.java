@@ -35,24 +35,27 @@ public class HttpConnector {
 
 
         // Send the result JSON to the server.
-    public void sendResult(String json) {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(getWebsiteUrl(UrlExtensions.RESULT)))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
+        public void sendResult(String json) {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(getWebsiteUrl(UrlExtensions.RESULT)))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
 
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != HttpURLConnection.HTTP_OK) {
-                throw new RuntimeException("Error: " + response.body());
+            try {
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                System.out.println("Response code: " + response.statusCode());
+                System.out.println("Response body: " + response.body());
+
+                if (response.statusCode() != HttpURLConnection.HTTP_OK) {
+                    throw new RuntimeException("Error: " + response.body());
+                }
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e.getMessage(), e);
             }
-            System.out.println("Response: " + response.body());
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e.getMessage());
         }
-    }
+
 
     // Helper method to construct the full URL.
     private String getWebsiteUrl(UrlExtensions extension) {

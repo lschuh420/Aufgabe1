@@ -1,7 +1,6 @@
 package com.example.cloudusageaggregator;
 
 import com.example.cloudusageaggregator.model.DataSetResponse;
-import com.example.cloudusageaggregator.dto.ResultPayload;
 import com.example.cloudusageaggregator.model.UsageResult;
 import com.example.cloudusageaggregator.service.HttpConnector;
 import com.example.cloudusageaggregator.service.UsageAggregationService;
@@ -18,25 +17,20 @@ public class Main {
             // Fetch dataset from the remote service
             String jsonDataset = httpConnector.fetchDatasetAsJson();
             System.out.println("Dataset JSON: " + jsonDataset);
+
             // Convert JSON to Dataset object
             DataSetResponse dataset = usageAggregationService.convertJsonToDataset(jsonDataset);
 
-            // Überprüfen Sie die Anzahl der Ereignisse
             if (dataset != null && dataset.getEvents() != null) {
                 System.out.println("Number of events fetched: " + dataset.getEvents().size());
-            } else {
-                System.err.println("Dataset is null or events list is empty.");
-            }
 
-
-
-            if (dataset != null && dataset.getEvents() != null) {
                 // Process dataset into usage results
                 List<UsageResult> results = usageAggregationService.processDatasetToResult(dataset.getEvents());
+                System.out.println("Number of usage results: " + results.size());
 
                 // Convert the result list into JSON format
                 String resultJson = usageAggregationService.convertResultToJson(results);
-
+                System.out.println("Result JSON: " + resultJson);
 
                 // Send the results as JSON back to the server
                 httpConnector.sendResult(resultJson);
@@ -47,7 +41,8 @@ public class Main {
             }
 
         } catch (Exception e) {
-            System.err.println("Error processing usage data: " + e.getMessage());
+            System.err.println("Error processing usage data");
+            e.printStackTrace();
         }
     }
 }
